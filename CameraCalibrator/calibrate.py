@@ -69,6 +69,7 @@ frame_shape = (0, 0)
 
 cap = cv2.VideoCapture(args.cam_id)
 
+
 while True:
     ret, frame = cap.read()
     if not ret:
