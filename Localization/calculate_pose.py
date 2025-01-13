@@ -1,25 +1,15 @@
 import math
 import numpy as np
-
-# AT detector results, pitch, [x, y, z, yaw, pitch]
-def calculate_tag_offset(tag_in_camera_frame, CAMERA_TO_ROBOT_OFFSET):
+                           # METERS----------------------  RAD---------------------
+def calculate_transformation(CAMERA_X, CAMERA_Y, CAMERA_Z, CAMERA_YAW, CAMERA_PITCH):
     sin_90 = math.sin(math.pi / 2)
     cos_90 = math.cos(math.pi / 2)
 
-    CAMERA_X = CAMERA_TO_ROBOT_OFFSET[0]
-    CAMERA_Y = CAMERA_TO_ROBOT_OFFSET[1]
-    CAMERA_Z = CAMERA_TO_ROBOT_OFFSET[2]
-    
-    CAMERA_YAW = CAMERA_TO_ROBOT_OFFSET[3]
-    CAMERA_PITCH = CAMERA_TO_ROBOT_OFFSET[4]
-    
     sin_pitch = math.sin(CAMERA_PITCH)
     cos_pitch = math.cos(CAMERA_PITCH)
     
     sin_yaw = math.sin(CAMERA_YAW)
     cos_yaw = math.cos(CAMERA_YAW)
-
-    tag_in_camera_frame = np.array([[tag_in_camera_frame[0]], [tag_in_camera_frame[1]], [tag_in_camera_frame[2]], [1]], dtype="object")
 
     # Camera Pitch
     pitch_rotation = np.array([
@@ -52,6 +42,13 @@ def calculate_tag_offset(tag_in_camera_frame, CAMERA_TO_ROBOT_OFFSET):
     # Move origin
     overall_transformation = np.matmul(camera_origin_to_robot_origin, corrected_pitch)
     
+    return overall_transformation
+
+# AT detector results, matrices from init
+def calculate_tag_offset(tag_in_camera_frame, overall_transformation):
+    
+    tag_in_camera_frame = np.array([[tag_in_camera_frame[0]], [tag_in_camera_frame[1]], [tag_in_camera_frame[2]], [1]], dtype="object")
+
     # Actual Coordinate Transform
     tag_in_robot_frame = np.matmul(overall_transformation, tag_in_camera_frame)
 
